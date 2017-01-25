@@ -56,15 +56,19 @@ def singleEval(useAmodalGT, onlyThings,amodalDt, amodalGt, maxProp):
     name = ""
     if useAmodalGT == 1:
         name = name + "Amodal mask"
-    else:
+    elif useAmodalGT == 2:
         name = name + "visible mask"
+    else:
+        raise NotImplementedError
 
     if onlyThings == 1:
         name = name + ", things only"
     elif onlyThings == 2:
         name = name + ", stuff only"
-    else:
+    elif onlyThings == 0:
         name = name + ", both stuff and things"
+    else:
+        raise NotImplementedError
 
     metric = Metric(name, maxProp)
     
@@ -145,8 +149,8 @@ if __name__ == "__main__":
     amodalDt=amodalGt.loadRes(amodalDtFile)
 
     if session == 'full':
-        metric10 = singleEval(1, 0, amodalDt, amodalGt, maxProp)
-        metric11 = singleEval(1, 1, amodalDt, amodalGt, maxProp) # amodalGT, thingsOnly
+        metric10 = singleEval(1, 0, amodalDt, amodalGt, maxProp) # amodalGT, both things and stuff
+        metric11 = singleEval(1, 1, amodalDt, amodalGt, maxProp) # amodalGT, things only
         metric12 = singleEval(1, 2, amodalDt, amodalGt, maxProp) # amodalGT, stuff only
         
         metric10.summarize()
