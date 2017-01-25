@@ -1,6 +1,6 @@
 # amodalAPI
 
-This is the PythonAPI to access the dataset proposed in [Semantic Amodal Segmentation](https://arxiv.org/abs/1509.01329). This API is largely built on [COCO API](https://github.com/pdollar/coco).
+This is the Python API to access the amodal segmentation dataset proposed in [Semantic Amodal Segmentation](https://arxiv.org/abs/1509.01329). This API is largely built on [COCO API](https://github.com/pdollar/coco).
 
 ## setup and download annotation json files
 
