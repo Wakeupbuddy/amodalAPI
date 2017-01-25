@@ -1,1 +1,5 @@
-./.ipynb_checkpoints/*
+PythonAPI/.ipynb_checkpoints/
+PythonAPI/*pyc
+images/
+exampleOutput/
+annotations
