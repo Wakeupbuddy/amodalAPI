@@ -134,7 +134,7 @@ if __name__ == "__main__":
     annFile = '%s/annotations/COCO_amodal_%s.json'%(dataDir,dataType)
     amodalGt=Amodal(annFile)
     imgIds=sorted(amodalGt.getImgIds())
-    amodalDtFile = '../results/%s_%s_amodalDt.json' %(modelName, dataType)
+    amodalDtFile = '/tmp/%s_%s_amodalDt.json' %(modelName, dataType)
 
     resFiles = []
     for filename in glob.glob(resFileFolder + '*.json'):
