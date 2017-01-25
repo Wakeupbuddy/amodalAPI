@@ -34,7 +34,7 @@ This is the Python API to access the amodal segmentation dataset proposed in [Se
   
   It measure amodal segment proposal qualities using metric of average recall. Please see table 3a and section 5.1 in [the paper] (https://arxiv.org/abs/1509.01329).
 
-  (The evaluation code need some cleanup. The depth ordering evaluation code will be released after the cleanup.)
+  (The evaluation code need some cleanup. Also, the depth ordering evaluation code will be released after the cleanup.)
   
 ## annotation tool
 
