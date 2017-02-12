@@ -1,5 +1,6 @@
 import os,sys,glob,json
 import pdb
+sys.path.append('./PythonAPI/')
 from pycocotools.amodal import Amodal
 from myPyAmodalEvalDemo import evalWrapper, filterDtFile
 dd = pdb.set_trace
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     session = sys.argv[3]
     #session = 'full'
      
-    dataDir = '../'
+    dataDir = './'
     #dataType = 'val2014'
     dataType = sys.argv[4]
     #maxProp = 1000
