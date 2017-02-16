@@ -1,8 +1,3 @@
-# evaluate the amodal segments
-MAXPROP=1000
-MODELNAME='example'
-LOGNAME='log.txt'
-JSONDIR="./exampleOutput/"
-python ./batchEval.py $JSONDIR $MODELNAME "full" "val2014" $MAXPROP
-#echo "final eval result in $LOGNAME"
-
+# evaluate the amodal segments from JSONDIR
+JSONDIR='./dt_amodalMask/'
+python batchEval.py -r $JSONDIR

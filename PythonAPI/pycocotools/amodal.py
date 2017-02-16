@@ -1,48 +1,5 @@
 __author__ = 'yzhu'
 __version__ = '0.1'
-# Interface for accessing the Amodal dataset, most documentation are out of date right now..
-
-# Microsoft COCO is a large image dataset designed for object detection,
-# segmentation, and caption generation. pycocotools is a Python API that
-# assists in loading, parsing and visualizing the annotations in COCO.
-# Please visit http://mscoco.org/ for more information on COCO, including
-# for the data, paper, and tutorials. The exact format of the annotations
-# is also described on the COCO website. For example usage of the pycocotools
-# please see pycocotools_demo.ipynb. In addition to this API, please download both
-# the COCO images and annotations in order to run the demo.
-
-# An alternative to using the API is to load the annotations directly
-# into Python dictionary
-# Using the API provides additional utility functions. Note that this API
-# supports both *instance* and *caption* annotations. In the case of
-# captions not all functions are defined (e.g. categories are undefined).
-
-# The following API functions are defined:
-#  COCO       - COCO api class that loads COCO annotation file and prepare data structures.
-#  decodeMask - Decode binary mask M encoded via run-length encoding.
-#  encodeMask - Encode binary mask M using run-length encoding.
-#  getAnnIds  - Get ann ids that satisfy given filter conditions.
-#  getCatIds  - Get cat ids that satisfy given filter conditions.
-#  getImgIds  - Get img ids that satisfy given filter conditions.
-#  loadAnns   - Load anns with the specified ids.
-#  loadCats   - Load cats with the specified ids.
-#  loadImgs   - Load imgs with the specified ids.
-#  segToMask  - Convert polygon segmentation to binary mask.
-#  showAnns   - Display the specified annotations.
-#  loadRes    - Load algorithm results and create API for accessing them.
-#  download   - Download COCO images from mscoco.org server.
-# Throughout the API "ann"=annotation, "cat"=category, and "img"=image.
-# Help on each functions can be accessed by: "help COCO>function".
-
-# See also COCO>decodeMask,
-# COCO>encodeMask, COCO>getAnnIds, COCO>getCatIds,
-# COCO>getImgIds, COCO>loadAnns, COCO>loadCats,
-# COCO>loadImgs, COCO>segToMask, COCO>showAnns
-
-# Microsoft COCO Toolbox.      version 2.0
-# Data, paper, and tutorials available at:  http://mscoco.org/
-# Code written by Piotr Dollar and Tsung-Yi Lin, 2014.
-# Licensed under the Simplified BSD License [see bsd.txt]
 
 import json
 import datetime
@@ -58,11 +15,9 @@ import itertools
 import mask
 import os
 from pycocotools.coco import COCO
-import pdb
-dd = pdb.set_trace
 
 class Amodal(COCO):
-    def __init__(self, annotation_file=None):
+    def __init__(self, annotation_file=None, verbose=True):
         """
         Constructor of Microsoft COCO helper class for reading and visualizing annotations.
         :param annotation_file (str): location of annotation file
@@ -70,6 +25,7 @@ class Amodal(COCO):
         :return:
         """
         COCO.__init__(self, annotation_file)
+        self.verbose = verbose
 
     def createIndex(self):
         # create index
@@ -92,8 +48,6 @@ class Amodal(COCO):
             imgs      = {im['id']: {} for im in self.dataset['images']}
             for img in self.dataset['images']:
                 imgs[img['id']] = img
-                #filenameToImgs[img['file_name']] = (img['id'], img['height'], img['width'])
-                #filenameToImgs[img['file_name']] = img
 
         print 'index created!'
 
@@ -102,13 +56,6 @@ class Amodal(COCO):
         self.imgToAnns = imgToAnns
         self.imgs = imgs
         self.regions = regions
-
-    def info(self):
-        """
-        Print information about the annotation file.
-        :return:
-        """
-        print("todo")
 
     def getAmodalAnnIds(self, imgIds=[]):
         """
@@ -155,14 +102,12 @@ class Amodal(COCO):
         return: None
         """
         if type(anns) == list:
-            print("anns cannot be a list! Should be a dict")
+            print("anns cannot be a list! Should be a dict.")
             return 0
         ax = plt.gca()
         polygons = []
         lines = []
         color = []
-        #print("total num: ")
-        #print(anns['size'])
         for ann in reversed(anns['regions']):
             c = np.random.random((1, 3)).tolist()[0]
             if type(ann['segmentation']) == list:
@@ -172,8 +117,9 @@ class Amodal(COCO):
                 polygons.append(Polygon(poly, True, alpha=0.2))
                 color.append(c)
             else:
-                #mask fixme
                 print("todo")
+                raise NotImplementedError
+
         p = PatchCollection(polygons, facecolors=color, edgecolors=(0,0,0,1), linewidths=3, alpha=0.8)
         ax.add_collection(p)
 
@@ -190,10 +136,7 @@ class Amodal(COCO):
         polygons = []
         lines = []
         color = []
-        #print("total num: ")
-        #print(anns['size'])
         for ann in reversed(anns['regions']):
-            #c = np.random.random((1, 3)).tolist()[0]
             c = np.zeros([1, 3]).tolist()[0]
             if type(ann['segmentation']) == list:
                 # polygon
@@ -202,16 +145,15 @@ class Amodal(COCO):
                 polygons.append(Polygon(poly, True, alpha=0.2))
                 color.append(c)
             else:
-                #mask fixme
                 print("todo")
+                raise NotImplementedError
+
         p = PatchCollection(polygons, facecolors=color, edgecolors=(1,1,1,1), linewidths=1, alpha=1)
         ax.add_collection(p)
 
     def showMask(self, M, ax, c = [0, 1, 0]):
         m = mask.decode([M])
         img = np.ones( (m.shape[0], m.shape[1], 3) )
-#        color_mask = np.array([1.0, 1.0, 1.0])/255
-        #c = [0.0, 1.0, 0.0] # green
         
         # get boundary quickly
         B = np.zeros( (m.shape[0], m.shape[1]) )
@@ -229,8 +171,6 @@ class Amodal(COCO):
             img[:, :, i] = c[i]
             ax.imshow(np.dstack( (img, B*1) ))
             ax.imshow(np.dstack( (img, m*0.3) ))
-
-        return
  
     def showAmodalInstance(self, anns, k=-1):
         """
@@ -299,7 +239,7 @@ class Amodal(COCO):
                 polygons.append(Polygon(poly, True, alpha=0.2))
                 color.append(c)
             else:
-                #mask fixme
+                #mask
                 mm = mask.decode([ann['segmentation']])
                 img = np.ones( (mm.shape[0], mm.shape[1], 3) )
                 color_mask = c
@@ -318,10 +258,8 @@ class Amodal(COCO):
         """
         res = Amodal()
         res.dataset['images'] = [img for img in self.dataset['images']]
-        # res.dataset['info'] = copy.deepcopy(self.dataset['info'])
-        # res.dataset['licenses'] = copy.deepcopy(self.dataset['licenses'])
-
-        print 'Loading and preparing results...     '
+        if self.verbose:
+            print 'Loading and preparing results...'
         tic = time.time()
         anns    = json.load(open(resFile))
         assert type(anns) == list, 'results in not an array of objects'
@@ -329,10 +267,8 @@ class Amodal(COCO):
         
         assert set(annsImgIds) == (set(annsImgIds) & set(self.getImgIds())), \
                'Results do not correspond to current coco set'
-       
-        print 'DONE (t=%0.2fs)'%(time.time()- tic)
+        if self.verbose:
+            print 'DONE (t=%0.2fs)'%(time.time()- tic)
         res.dataset['annotations'] = anns
         res.createIndex()
         return res
-    def download( self, tarDir = None, imgIds = [] ):
-        print("todo")

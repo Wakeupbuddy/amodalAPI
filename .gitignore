@@ -1,5 +1,7 @@
+images/
+bsds_images/
+annotations/
+
 PythonAPI/.ipynb_checkpoints/
 PythonAPI/*pyc
-images/
-exampleOutput/
-annotations
+PythonAPI/pycocotools/*pyc

@@ -1,9 +1,11 @@
+from __future__ import print_function
 import os,sys,glob,json
-import pdb
-sys.path.append('./PythonAPI/')
+import string
+import random
+import argparse
 from pycocotools.amodal import Amodal
-from myPyAmodalEvalDemo import evalWrapper, filterDtFile
-dd = pdb.set_trace
+from PythonAPI.myPyAmodalEvalDemo import evalWrapper, filterDtFile
+
 mystr = "{:10.4f}".format
 
 class Metric(object):
@@ -19,40 +21,34 @@ class Metric(object):
         self.ap_none = 0
         self.ap_partial = 0
         self.ap_heavy = 0
-        #self.ap_severe = 0
         self.ar_none = 0
         self.ar_partial = 0
         self.ar_heavy = 0
-        #self.ar_severe = 0
-        self.order_ar_05 = {} # random, score, oracle
-        self.order_ar = {}
         self.maxProp = maxProp
-
-    def summarize(self):
-        print("")
-        print("== " + self.name)
-        print("AR1: " + mystr(self.ar1))
-        print("AR10: " + mystr(self.ar10))
-        print("AR100: " + mystr(self.ar100))
+    
+    def summarize(self, outputFile = ''):
+        if outputFile != '':
+            fout = open(outputFile, 'a')
+            myprint = lambda x: fout.write(x + '\n')
+        else:
+            myprint = lambda x: print(x)
+        
+        myprint("")
+        myprint("== " + self.name)
+        myprint("AR1: " + mystr(self.ar1))
+        myprint("AR10: " + mystr(self.ar10))
+        myprint("AR100: " + mystr(self.ar100))
         if self.maxProp == 1000:
-            print("AR1000: " + mystr(self.ar1000))
+            myprint("AR1000: " + mystr(self.ar1000))
 
-        print("AR_none: " + mystr(self.ar_none))
-        print("AR_partial: " + mystr(self.ar_partial))
-        print("AR_heavy: " + mystr(self.ar_heavy))
-        #print("AR_severe: " + mystr(self.ar_severe))
-        
-        order_ar05_str = ''
-        for key, val in self.order_ar_05.iteritems():
-            order_ar05_str = order_ar05_str + " " + key + ":" + mystr(val)+ " -"
-        print("order AR 0.5: " + order_ar05_str)
-        
-        order_ar_str = ''
-        for key, val in self.order_ar.iteritems():
-            order_ar_str = order_ar_str + " " + key + ":" + mystr(val)+ " -"
-        print("order AR: " + order_ar_str)        
+        myprint("AR_none: " + mystr(self.ar_none))
+        myprint("AR_partial: " + mystr(self.ar_partial))
+        myprint("AR_heavy: " + mystr(self.ar_heavy))
+       
+        if outputFile != '':
+            fout.close()
 
-def singleEval(useAmodalGT, onlyThings,amodalDt, amodalGt, maxProp):
+def singleEval(amodalDt, amodalGt, useAmodalGT=1, onlyThings=0, maxProp=1000):
     # eval on different occlusion levels
     name = ""
     if useAmodalGT == 1:
@@ -73,10 +69,9 @@ def singleEval(useAmodalGT, onlyThings,amodalDt, amodalGt, maxProp):
 
     metric = Metric(name, maxProp)
     
-    sortKey = 'oracle'
+    useAmodalDT = 1
     occRange = 'all'
-    useAmodalDT = 0
-    stats = evalWrapper(amodalDt, amodalGt, useAmodalGT, useAmodalDT, onlyThings, sortKey, occRange, maxProp)
+    stats = evalWrapper(amodalDt, amodalGt, useAmodalGT, useAmodalDT, onlyThings, occRange, maxProp)
     metric.ap = stats[0]
     metric.ap_05 = stats[1]
     metric.ap_075 = stats[2]
@@ -84,81 +79,81 @@ def singleEval(useAmodalGT, onlyThings,amodalDt, amodalGt, maxProp):
     metric.ar10 = stats[4]
     metric.ar100 = stats[5]
     metric.ar1000 = stats[6]
-    metric.order_ar['oracle'] = stats[7]
-    metric.order_ar_05['oracle'] = stats[8]
 
-    sortKey = 'oracle'
     occRange = 'none'
-    stats = evalWrapper(amodalDt, amodalGt,useAmodalGT, useAmodalDT, onlyThings, sortKey, occRange, maxProp)
+    stats = evalWrapper(amodalDt, amodalGt,useAmodalGT, useAmodalDT, onlyThings, occRange, maxProp)
     metric.ap_none = stats[0]
     if maxProp == 100:
         metric.ar_none = stats[5]
-    else:
+    elif maxProp == 1000:
         metric.ar_none = stats[6]
     del stats
 
-    sortKey = 'oracle'
     occRange = 'partial'
-    stats = evalWrapper(amodalDt, amodalGt,useAmodalGT, useAmodalDT, onlyThings, sortKey, occRange, maxProp)
+    stats = evalWrapper(amodalDt, amodalGt,useAmodalGT, useAmodalDT, onlyThings, occRange, maxProp)
     metric.ap_partial = stats[0]
     if maxProp == 100:
         metric.ar_partial = stats[5]
-    else:
+    elif maxProp == 1000:
         metric.ar_partial = stats[6]
     del stats
 
-    sortKey = 'oracle'
     occRange = 'heavy'
-    stats = evalWrapper(amodalDt, amodalGt, useAmodalGT, useAmodalDT, onlyThings, sortKey, occRange, maxProp)
+    stats = evalWrapper(amodalDt, amodalGt, useAmodalGT, useAmodalDT, onlyThings, occRange, maxProp)
     metric.ap_heavy = stats[0]
     if maxProp == 100:
         metric.ar_heavy = stats[5]
-    else:
+    elif maxProp == 1000:
         metric.ar_heavy = stats[6]
     del stats
     
     return metric
 
-if __name__ == "__main__":
-    
-    resFileFolder = sys.argv[1]
-    modelName = sys.argv[2]
-
-    session = sys.argv[3]
-    #session = 'full'
-     
-    dataDir = './'
-    #dataType = 'val2014'
-    dataType = sys.argv[4]
-    #maxProp = 1000
-    maxProp = int(sys.argv[5])
-    annFile = '%s/annotations/COCO_amodal_%s.json'%(dataDir,dataType)
+def main(args):
+    annFile = '%s/annotations/COCO_amodal_%s.json'%(args.dataDir,args.dataType)
     amodalGt=Amodal(annFile)
     imgIds=sorted(amodalGt.getImgIds())
-    amodalDtFile = '/tmp/%s_%s_amodalDt.json' %(modelName, dataType)
+    amodalDtFile = '/tmp/%s_amodalDt.json' %(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6)))
 
     resFiles = []
-    for filename in glob.glob(resFileFolder + '*.json'):
+    for filename in glob.glob(args.resFileFolder + '*.json'):
         resFiles.append(filename)
     if len(resFiles) == 0:
         print("wrong")
-    assert len(resFiles) > 0, " wrong resFileFolder?"
+    assert len(resFiles) > 0, " wrong resFileFolder."
             
     amodalDt = filterDtFile(resFiles, imgIds)
     with open(amodalDtFile, 'wb') as output:
         json.dump(amodalDt, output)
     amodalDt=amodalGt.loadRes(amodalDtFile)
-
-    if session == 'full':
-        metric10 = singleEval(1, 0, amodalDt, amodalGt, maxProp) # amodalGT, both things and stuff
-        metric11 = singleEval(1, 1, amodalDt, amodalGt, maxProp) # amodalGT, things only
-        metric12 = singleEval(1, 2, amodalDt, amodalGt, maxProp) # amodalGT, stuff only
+    # both things and stuff
+    metric10 = singleEval(amodalDt, amodalGt, onlyThings=0, maxProp=args.maxProp)
+    # things only
+    metric11 = singleEval(amodalDt, amodalGt, onlyThings=1, maxProp=args.maxProp)
+    # amodalGT, stuff only
+    metric12 = singleEval(amodalDt, amodalGt, onlyThings=2, maxProp=args.maxProp)
+    
+    metric10.summarize(args.outputFile)
+    metric11.summarize(args.outputFile)
+    metric12.summarize(args.outputFile)
         
-        metric10.summarize()
-        metric11.summarize()
-        metric12.summarize()
-    else:
-        raise NotImplementedError
-        
+    metrics = {}
+    metrics['both'] = metric10
+    metrics['things'] = metric11
+    metrics['stuff'] = metric12
+    
     os.system("rm -f " + amodalDtFile)
     print("done! intermediate file cleaned!")
+    
+    return metrics
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--resFileFolder', required=True)
+    parser.add_argument('--dataType', default='val2014')
+    parser.add_argument('--dataDir', default='./')
+    parser.add_argument('--maxProp', default=1000, type=int)
+    parser.add_argument('--outputFile', default='', type=str)
+    args = parser.parse_args()
+
+    metrics = main(args)
