@@ -1,43 +1,43 @@
-# amodalAPI
+# Semantic Amodal Segmentation dataset and API
 
-This is the Python API to access the amodal segmentation dataset proposed in [Semantic Amodal Segmentation](https://arxiv.org/abs/1509.01329). This API is largely built on [COCO API](https://github.com/pdollar/coco).
+This is the Python API code for the amodal segmentation dataset proposed in [Semantic Amodal Segmentation](https://arxiv.org/abs/1509.01329) (CVPR 2017). This API code is built on [COCO API](https://github.com/pdollar/coco).
 
-## setup and download annotation json files
+## setup
 
-1. install coco PythonAPI
+1. git clone and compile:
+  * ```git clone https://github.com/wakeupbuddy/amodalAPI```
   * ```cd PythonAPI; python setup.py build_ext install; cd ..```
 
-2. create soft link of the coco images:
+2. create soft link for coco/bsds images:
   * ```ln -s /your/coco/images ./images```
+  * ```ln -s /your/bsds/images ./bsds_images```
+3. dowload [annotation files](https://drive.google.com/open?id=0B8e3LNo7STslZURoTzhhMFpCelE) and untar.
 
-3. dowload amodal annotation files:
-  * ```wget https://www.dropbox.com/s/4znu1sbf67c8c96/annotations.tar.gz```
-  * ```tar xvf annotations.tar.gz```
-  
+## notebook demo
 
+  1. To see the annotation format/structure and some useful APIs, please run the [ipython notebook](https://github.com/Wakeupbuddy/amodalAPI/blob/master/PythonAPI/myAmodalDemo.ipynb).
 
-## view the amodal annotation
-
-  1. To see the annotation format/structure and some useful API, please run the ipython notebook: 
-  https://github.com/Wakeupbuddy/amodalAPI/blob/master/PythonAPI/myAmodalDemo.ipynb
-  
 ## evaluate
 
-1. dowload an example json output on coco val set:
-
-  * ```cd ./amodalAPI```
-  * ```wget https://www.dropbox.com/s/5ermfba905l0dsb/exampleOutput.tar.gz```
-  * ```tar xvf exampleOutput.tar.gz```
+1. dowload the [baseline amodalMask output](https://drive.google.com/open?id=0B8e3LNo7STslUGRFUVlQSnZRUVE) on coco val set and untar:
   
 2. run the segmentation evaluation. 
   * ```bash eval.sh```
   
-  It measure amodal segment proposal qualities using metric of average recall. Please see table 3a and section 5.1 in [the paper] (https://arxiv.org/abs/1509.01329).
-
-  (The evaluation code need some cleanup. Also, the depth ordering evaluation code will be released after the cleanup.)
+  It measures amodal segment proposal quality using average recall. Please see details in table 3a and section 5.1 from [the paper] (https://arxiv.org/abs/1509.01329).
   
 ## annotation tool
 
-We also relase the web tool we used for annotation in another repo here: https://github.com/Wakeupbuddy/amodal-ui . It's a modified version from [OpenSurface](https://github.com/seanbell/opensurfaces).
+We also release the web tool we used for annotation in another repo [here](https://github.com/Wakeupbuddy/amodal-ui). It's modified based on [OpenSurface](https://github.com/seanbell/opensurfaces).
 
+## citation
 
+If you find this dataset useful to your research, please consider citing:
+```
+@inproceedings{zhu2017semantic,
+    Author = {Zhu, Yan and Tian, Yuandong and Mexatas, Dimitris and Doll{\'a}r, Piotr},
+    Title = {Semantic Amodal Segmentation},
+    Booktitle = {Conference on Computer Vision and Pattern Recognition ({CVPR})},
+    Year = {2017}
+}
+```
