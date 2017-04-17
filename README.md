@@ -15,7 +15,7 @@ This is the Python API code for the amodal segmentation dataset proposed in [Sem
 
 ## notebook demo
 
-  1. To see the annotation format/structure and some useful APIs, please run the [ipython notebook](https://github.com/Wakeupbuddy/amodalAPI/blob/master/PythonAPI/myAmodalDemo.ipynb).
+  1. To see the annotation and some useful APIs, please run the [ipython notebook demo](https://github.com/Wakeupbuddy/amodalAPI/blob/master/PythonAPI/myAmodalDemo.ipynb).
 
 ## evaluate
 
@@ -24,7 +24,7 @@ This is the Python API code for the amodal segmentation dataset proposed in [Sem
 2. run the segmentation evaluation. 
   * ```bash eval.sh```
   
-  It measures amodal segment proposal quality using average recall. Please see details in table 3a and section 5.1 from [the paper] (https://arxiv.org/abs/1509.01329).
+  It measures amodal segment proposal quality using average recall. Please see details in table 3a and section 5.1 from [the paper](https://arxiv.org/abs/1509.01329).
   
 ## annotation tool
 
