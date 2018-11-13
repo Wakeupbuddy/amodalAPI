@@ -7,7 +7,6 @@ from collections import defaultdict
 import json
 import mask
 import copy
-import torchfile
 import operator
 import os.path
 class AmodalEval:
@@ -58,7 +57,7 @@ class AmodalEval:
                     elif type(region['segmentation']) == dict and type(region['segmentation']['counts']) == list:
                         region['segmentation'] = mask.frPyObjects([region['segmentation']],t['height'],t['width'])[0]
                     elif type(region['segmentation']) == dict and \
-                        type(region['segmentation']['counts'] == unicode or type(region['segmentation']['counts']) == str):
+                        type(region['segmentation']['counts']) == unicode or type(region['segmentation']['counts']) == str):
                         # format is already RLE, do nothing
                         if 'area' not in region:
                             region['area'] = mask.area([region['segmentation']])[0]
